@@ -12,6 +12,7 @@ SECRET_KEY=<your secret key for JWT signing>
 ## Usage
 
 ```
+npm i
 npm run serve
 ```
 
