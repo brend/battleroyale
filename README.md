@@ -4,14 +4,14 @@
 
 Make sure to configure the following environment variables:
 
-```
+``` ini
 MONGO_URI=mongodb://<your mongo db instance>
 SECRET_KEY=<your secret key for JWT signing>
 ```
 
 ## Usage
 
-```
+``` sh
 npm i
 npm run serve
 ```
