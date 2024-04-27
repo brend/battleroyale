@@ -18,7 +18,7 @@ async function registerUser(req, res) {
 
     // Create and save the user
     const user = new User({
-      username: req.body.username,
+      username: req.body.username ?? req.body.email,
       email: req.body.email,
       password: hashedPassword,
     });
@@ -28,8 +28,12 @@ async function registerUser(req, res) {
     // Send verification email...
     console.log('User created:', savedUser);
 
-    res.status(201).send('User created.');
+    // Generate JWT
+    const token = generateToken(user);
+
+    res.status(201).send({user, token});
   } catch (error) {
+    console.error(error);
     res.status(500).send('Error registering new user.');
   }
 }
@@ -55,14 +59,40 @@ async function loginUser(req, res) {
     // Generate JWT...
     const token = generateToken(user);
 
-    res.status(200).send(token);
+    res.status(200).send({user, token});
   } catch (error) {
       res.status(500).send('Error logging in.');
   }
 }
 
-function getUserProfile(req, res) {
-  res.send(`Welcome to your profile, ${req.user.username}!`);
+async function updateUserData(req, res) {
+  try {
+    // Validate input...
+
+    // Check if user exists
+    const user = await User.findOne({ email: req.body.email });
+
+    if (!user) {
+        return res.status(404).send('User not found.');
+    }
+
+    // Update user data...
+    user.username = req.body.username ?? user.username;
+    user.email = req.body.email ?? user.email;
+//    user.password = req.body.password ?? user.password;
+  
+    const updatedUser = await user.save();
+  
+    res.status(200).send(updatedUser);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error updating user data.');
+  }
 }
 
-module.exports = { registerUser, loginUser, getUserProfile };
+function getUserProfile(req, res) {
+  console.log("returning sample user profile", req);
+  res.send({username: "Fester Testerbester", email: "fester@tester.com"});
+}
+
+module.exports = { registerUser, loginUser, getUserProfile, updateUserData };
