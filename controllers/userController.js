@@ -3,6 +3,10 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const { generateToken } = require('../middleware/authMiddleware');
 
+function errobj(message) {
+  return {message: message};
+}
+
 async function registerUser(req, res) {
   try {
     // Validate input...
@@ -10,7 +14,7 @@ async function registerUser(req, res) {
     // Check if user already exists
     const existingUser = await User.findOne({ email: req.body.email });
     if (existingUser) {
-      return res.status(400).send('User already exists.');
+      return res.status(400).send(errobj('User already exists.'));
     }
 
     // Hash password
@@ -34,7 +38,7 @@ async function registerUser(req, res) {
     res.status(201).send({user, token});
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error registering new user.');
+    res.status(500).send(errobj('Error registering new user.'));
   }
 }
 
@@ -46,14 +50,14 @@ async function loginUser(req, res) {
     const user = await User.findOne({ email: req.body.email });
 
     if (!user) {
-        return res.status(404).send('User not found.');
+        return res.status(404).send(errobj('User not found.'));
     }
 
     // Check password
     const validPassword = await bcrypt.compare(req.body.password, user.password);
 
     if (!validPassword) {
-        return res.status(400).send('Invalid password.');
+        return res.status(400).send(errobj('Invalid password.'));
     }
 
     // Generate JWT...
@@ -61,11 +65,11 @@ async function loginUser(req, res) {
 
     res.status(200).send({user, token});
   } catch (error) {
-      res.status(500).send('Error logging in.');
+      res.status(500).send(errobj('Error logging in.'));
   }
 }
 
-async function updateUserData(req, res) {
+async function updateProfile(req, res) {
   try {
     // Validate input...
 
@@ -73,7 +77,7 @@ async function updateUserData(req, res) {
     const user = await User.findOne({ email: req.body.email });
 
     if (!user) {
-        return res.status(404).send('User not found.');
+        return res.status(404).send(errobj('User not found.'));
     }
 
     // Update user data...
@@ -86,13 +90,28 @@ async function updateUserData(req, res) {
     res.status(200).send(updatedUser);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error updating user data.');
+    res.status(500).send(errobj('Error updating user data.'));
   }
 }
 
-function getUserProfile(req, res) {
-  console.log("returning sample user profile", req);
-  res.send({username: "Fester Testerbester", email: "fester@tester.com"});
+async function getProfile(req, res) {
+  try {
+    // Validate input...
+
+    // Check if user exists
+    console.log("Trying to find user with email:", req.query.email, "or username:", req.query.username);
+    let user = await User.findOne({ email: req.query.email }) 
+      ?? User.findOne({ username: req.query.username });
+
+    if (!user) {
+        return res.status(404).send(errobj('User not found.'));
+    }
+
+    res.status(200).send(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(errobj('Error getting user data.'));
+  }
 }
 
-module.exports = { registerUser, loginUser, getUserProfile, updateUserData };
+module.exports = { registerUser, loginUser, getProfile, updateProfile };
