@@ -30,7 +30,11 @@ const userSchema = new Schema({
   updated_at: {
     type: Date,
     default: Date.now
-  }
+  },
+  roles: {
+    type: [String],
+    default: ['user']
+  },
 });
 
 // Middleware to handle updating the 'updated_at' field.

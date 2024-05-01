@@ -97,11 +97,14 @@ async function updateProfile(req, res) {
 async function getProfile(req, res) {
   try {
     // Validate input...
+    if (!req.query.email && !req.query.username) {
+        return res.status(400).send(errobj('Email or username is required.'));
+    }
 
     // Check if user exists
     console.log("Trying to find user with email:", req.query.email, "or username:", req.query.username);
     let user = await User.findOne({ email: req.query.email }) 
-      ?? User.findOne({ username: req.query.username });
+      ?? await User.findOne({ username: req.query.username });
 
     if (!user) {
         return res.status(404).send(errobj('User not found.'));

@@ -16,12 +16,22 @@ const tournamentSchema = new Schema({
     required: true,
     trim: true
   },
+  maximum_participants: {
+    type: Number,
+    required: true,
+    min: 2
+  },
   start_date: {
     type: Date,
     required: true
   },
   end_date: {
     type: Date,
+    required: true
+  },
+  created_by: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
   created_at: {
@@ -32,13 +42,7 @@ const tournamentSchema = new Schema({
     type: Date,
     default: Date.now
   }
-});
-
-// Middleware to handle updating the 'updated_at' field
-tournamentSchema.pre('save', function (next) {
-  this.updated_at = new Date();
-  next();
-});
+}, {timestamps: true});
 
 // Create the model from the schema
 const Tournament = mongoose.model('Tournament', tournamentSchema);
