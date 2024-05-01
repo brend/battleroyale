@@ -41,9 +41,20 @@ async function create(req, res) {
 
 async function update(req, res) {
   try {
-    console.log("What do you know?", req.params, req.body);
-    // Validate input...
     const data = req.body;
+    
+    if (!data._id) {
+      return res.status(400).send(errobj('Missing tournament ID.'));
+    }
+
+    if (data.maximum_participants && data.maximum_participants < 2) {
+      return res.status(400).send(errobj('Maximum participants must be at least 2.'));
+    }
+
+    if (data.start_date && data.end_date && data.start_date >= data.end_date) {
+      return res.status(400).send(errobj('End date must be after start date.'));
+    }
+    
     const updatedTournament = await Tournament.findByIdAndUpdate(data._id, data);
     res.status(200).send(updatedTournament);
   } catch (error) {
@@ -54,7 +65,10 @@ async function update(req, res) {
 
 async function remove(req, res) {
   try {
-    // Validate input...
+    if (!req.params) {
+      return res.status(400).send(errobj('Missing tournament ID.'));
+    }
+
     const removedTournament = await Tournament.findByIdAndRemove(req.params);
     res.status(200).send(removedTournament);
   } catch (error) {

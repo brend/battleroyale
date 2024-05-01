@@ -9,7 +9,9 @@ function errobj(message) {
 
 async function registerUser(req, res) {
   try {
-    // Validate input...
+    if (!req.body.email || !req.body.password || !req.body.username) {
+      return res.status(400).send(errobj('Email, user name, and password are required.'));
+    }
 
     // Check if user already exists
     const existingUser = await User.findOne({ email: req.body.email });
@@ -44,7 +46,9 @@ async function registerUser(req, res) {
 
 async function loginUser(req, res) {
   try {
-    // Validate input...
+    if (!req.body.email || !req.body.password) {
+      return res.status(400).send(errobj('Email and password are required.'));
+    }
 
     // Check if user exists
     const user = await User.findOne({ email: req.body.email });
@@ -60,7 +64,6 @@ async function loginUser(req, res) {
         return res.status(400).send(errobj('Invalid password.'));
     }
 
-    // Generate JWT...
     const token = generateToken(user);
 
     res.status(200).send({user, token});
@@ -71,7 +74,13 @@ async function loginUser(req, res) {
 
 async function updateProfile(req, res) {
   try {
-    // Validate input...
+    if (!req.body.email) {
+      return res.status(400).send(errobj('Email is required.'));
+    }
+
+    if (!req.body.username) {
+      return res.status(400).send(errobj('Username is required.'));
+    }
 
     // Check if user exists
     const user = await User.findOne({ email: req.body.email });
@@ -83,7 +92,6 @@ async function updateProfile(req, res) {
     // Update user data...
     user.username = req.body.username ?? user.username;
     user.email = req.body.email ?? user.email;
-//    user.password = req.body.password ?? user.password;
   
     const updatedUser = await user.save();
   
@@ -96,7 +104,6 @@ async function updateProfile(req, res) {
 
 async function getProfile(req, res) {
   try {
-    // Validate input...
     if (!req.query.email && !req.query.username) {
         return res.status(400).send(errobj('Email or username is required.'));
     }
