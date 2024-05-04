@@ -109,7 +109,6 @@ async function getProfile(req, res) {
     }
 
     // Check if user exists
-    console.log("Trying to find user with email:", req.query.email, "or username:", req.query.username);
     let user = await User.findOne({ email: req.query.email }) 
       ?? await User.findOne({ username: req.query.username });
 

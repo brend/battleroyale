@@ -7,7 +7,6 @@ const cors = require('cors');
 const connectDB = require('./database/dbConnect');
 const userRoutes = require('./routes/userRoutes');
 const tournamentRoutes = require('./routes/tournamentRoutes');
-const gameoflifeRoutes = require('./routes/gameoflifeRoutes');
 
 const app = express();
 
@@ -18,7 +17,6 @@ connectDB();
 
 app.use('/api/users', userRoutes);
 app.use('/api/tournament', tournamentRoutes);
-app.use('/api/gameoflife', gameoflifeRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
