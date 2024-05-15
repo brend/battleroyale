@@ -20,16 +20,16 @@ async function listEntries(req, res) {
 async function upsertEntry(req, res) {
     try {
         const tournamentId = req.query.tournament;
-        const user = req.user;
+        const userId = req.user?.id;
         const data = req.body;
 
-        if (!tournamentId || !user || !data) {
+        if (!tournamentId || !userId || !data) {
             return res.status(400).send({ message: "Missing required fields" });
         }
 
         const entry = await Entry.findOneAndUpdate(
-            { user: user._id, tournament: tournamentId },
-            { data: data },
+            { user: userId, tournament: tournamentId },
+            { user: userId, tournament: tournamentId, data: data },
             { upsert: true, new: true, runValidators: true }
         );
 
